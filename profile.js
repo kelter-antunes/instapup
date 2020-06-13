@@ -10,7 +10,7 @@ module.exports = function(url) {
         (async () => {
 
             const browser = await puppeteer.launch({
-                headless: false, // debug only
+                headless: true, // debug only
                 args: ['--no-sandbox'],
                 userDataDir: './user_data'
             })
