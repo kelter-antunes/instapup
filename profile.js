@@ -4,9 +4,11 @@ const fs = require('fs');
 var username = process.env.username || 'xxx';
 var password = process.env.password || 'xxx';
 
+
 module.exports = function(url) {
     return new Promise((resolve, reject) => {;
         (async () => {
+
             const browser = await puppeteer.launch({
                 headless: false, // debug only
                 args: ['--no-sandbox'],
