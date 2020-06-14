@@ -11,25 +11,30 @@ module.exports = function(url) {
 
             const browser = await puppeteer.launch({
                 headless: true, // debug only
-                args: ['--no-sandbox'],
-                userDataDir: './user_data'
-            })
+                args: ['--no-sandbox']
+                //userDataDir: './user_data'
+            });
+
+            const rand = function() { return Math.floor(1000 + Math.random() * 2000) };
+
             const page = await browser.newPage();
 
-            const cookiesPath = './insta-session.json';
+            
+                        const cookiesPath = './insta-session.json';
 
-            // If the cookies file exists, read the cookies.
-            const previousSession = fs.existsSync(cookiesPath)
-            if (previousSession) {
-                const content = fs.readFileSync(cookiesPath);
-                const cookiesArr = JSON.parse(content);
-                if (cookiesArr.length !== 0) {
-                    for (let cookie of cookiesArr) {
-                        await page.setCookie(cookie)
-                    }
-                    console.log('Session has been loaded in the browser')
-                }
-            }
+                        // If the cookies file exists, read the cookies.
+                        const previousSession = fs.existsSync(cookiesPath)
+                        if (previousSession) {
+                            const content = fs.readFileSync(cookiesPath);
+                            const cookiesArr = JSON.parse(content);
+                            if (cookiesArr.length !== 0) {
+                                for (let cookie of cookiesArr) {
+                                    await page.setCookie(cookie)
+                                }
+                                console.log('Session has been loaded in the browser')
+                            }
+                        }
+                        
 
             // set viewport and user agent (just in case for nice viewing)
             await page.setViewport({ width: 1366, height: 768 });
@@ -86,12 +91,17 @@ module.exports = function(url) {
             });
 
             //wait 1 sec
-            page.waitFor(1 * 1000);
+            page.waitFor(rand());
+
+
+            
 
             // Write Cookies
             const cookiesObject = await page.cookies()
             fs.writeFileSync(cookiesPath, JSON.stringify(cookiesObject));
             console.log('Session has been saved to ' + cookiesPath);
+          
+
 
             await page.emulateMedia('screen');
             let sharedData = await page.evaluate(() => {
