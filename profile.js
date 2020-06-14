@@ -1,13 +1,17 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-var username = process.env.username || 'xxx';
-var password = process.env.password || 'xxx';
-
-
-module.exports = function(url) {
+module.exports = function(user) {
     return new Promise((resolve, reject) => {;
         (async () => {
+
+
+            var username = process.env.username || 'xxx';
+            var password = process.env.password || 'xxx';
+
+            console.log('Username: ' + username);
+
+
 
             const browser = await puppeteer.launch({
                 headless: true, // debug only
@@ -19,22 +23,22 @@ module.exports = function(url) {
 
             const page = await browser.newPage();
 
-            
-                        const cookiesPath = './insta-session.json';
 
-                        // If the cookies file exists, read the cookies.
-                        const previousSession = fs.existsSync(cookiesPath)
-                        if (previousSession) {
-                            const content = fs.readFileSync(cookiesPath);
-                            const cookiesArr = JSON.parse(content);
-                            if (cookiesArr.length !== 0) {
-                                for (let cookie of cookiesArr) {
-                                    await page.setCookie(cookie)
-                                }
-                                console.log('Session has been loaded in the browser')
-                            }
-                        }
-                        
+            const cookiesPath = './insta-session.json';
+
+            // If the cookies file exists, read the cookies.
+            const previousSession = fs.existsSync(cookiesPath)
+            if (previousSession) {
+                const content = fs.readFileSync(cookiesPath);
+                const cookiesArr = JSON.parse(content);
+                if (cookiesArr.length !== 0) {
+                    for (let cookie of cookiesArr) {
+                        await page.setCookie(cookie)
+                    }
+                    console.log('Session has been loaded in the browser')
+                }
+            }
+
 
             // set viewport and user agent (just in case for nice viewing)
             await page.setViewport({ width: 1366, height: 768 });
@@ -86,6 +90,7 @@ module.exports = function(url) {
 
             }
 
+            let url = 'https://www.instagram.com/' + user + '/'
             await page.goto(url, {
                 waitUntil: ['load', 'networkidle0', 'domcontentloaded']
             });
@@ -94,13 +99,13 @@ module.exports = function(url) {
             page.waitFor(rand());
 
 
-            
+
 
             // Write Cookies
             const cookiesObject = await page.cookies()
             fs.writeFileSync(cookiesPath, JSON.stringify(cookiesObject));
             console.log('Session has been saved to ' + cookiesPath);
-          
+
 
 
             await page.emulateMedia('screen');

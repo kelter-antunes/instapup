@@ -17,9 +17,9 @@ app.get('/screenshot', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-  const url = req.query.url
+  const user = req.query.user
   ;(async () => {
-    const sharedData = await profile(url)
+    const sharedData = await profile(user)
     res.setHeader('Content-Type', 'application/json')
     res.send(sharedData)
   })()
