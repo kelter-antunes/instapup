@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 const pup = puppeteer.launch({
-    headless: false, // debug only
+    headless: true, // debug only
     args: ['--no-sandbox']
     //userDataDir: './user_data'
 });
