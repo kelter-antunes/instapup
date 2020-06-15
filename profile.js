@@ -1,27 +1,34 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
+const pup = puppeteer.launch({
+    headless: false, // debug only
+    args: ['--no-sandbox']
+    //userDataDir: './user_data'
+});
+
+const rand = function() { return Math.floor(200 + Math.random() * 1000) };
+
 module.exports = function(user) {
     return new Promise((resolve, reject) => {;
         (async () => {
 
-
             var username = process.env.username || 'xxx';
             var password = process.env.password || 'xxx';
-
             console.log('Username: ' + username);
 
-
-
-            const browser = await puppeteer.launch({
-                headless: true, // debug only
-                args: ['--no-sandbox']
-                //userDataDir: './user_data'
-            });
-
-            const rand = function() { return Math.floor(1000 + Math.random() * 2000) };
+            const browser = await pup;
 
             const page = await browser.newPage();
+            await page.setRequestInterception(true);
+            page.on('request', (request) => {
+                if (['image', 'stylesheet', 'font'].indexOf(request.resourceType()) !== -1) {
+                    request.abort();
+                } else {
+                    request.continue();
+                }
+            });
+
 
 
             const cookiesPath = './insta-session.json';
@@ -42,7 +49,7 @@ module.exports = function(user) {
 
             // set viewport and user agent (just in case for nice viewing)
             await page.setViewport({ width: 1366, height: 768 });
-            await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
+            await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36');
 
             // Wait until page has loaded
             await page.goto('https://www.instagram.com/', {
@@ -99,21 +106,25 @@ module.exports = function(user) {
             page.waitFor(rand());
 
 
-
-
             // Write Cookies
             const cookiesObject = await page.cookies()
             fs.writeFileSync(cookiesPath, JSON.stringify(cookiesObject));
             console.log('Session has been saved to ' + cookiesPath);
 
+            let sharedData = {
+                id: 0,
+            };
+            try {
+                sharedData = await page.evaluate(() => {
+                    return window._sharedData.entry_data.ProfilePage[0].graphql.user;
+                });
+            } catch (e) {
+                console.log('main program error:' + e);
+            }
 
 
-            await page.emulateMedia('screen');
-            let sharedData = await page.evaluate(() => {
-                return window._sharedData.entry_data.ProfilePage[0].graphql.user;
-            });
-
-            await browser.close();
+            // await browser.close();
+            await page.close();
 
             resolve(sharedData)
         })()
