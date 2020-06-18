@@ -42,8 +42,10 @@ exports.get = (req, res, next) => {
                 res.send(value);
             } catch (error) {
                 console.log('error while getting instagram for: ' + key);
-                res.status(503).send({
-                    error: "Instagram error, please try again later."
+                //console.log(error);
+                res.send({
+                    error_code: error.statusCode,
+                    error_message: await JSON.stringify(error.error)
                 });
             }
 
@@ -56,27 +58,3 @@ exports.get = (req, res, next) => {
     }
 
 };
-
-
-/*
-exports.getById = (req, res, next) => {
-    res.status(200).send('Requisição recebida com sucesso!');
-};
-
-
-
-exports.post = (req, res, next) => {
-    res.status(201).send('Requisição recebida com sucesso!');
-};
-
-
-exports.put = (req, res, next) => {
-    let id = req.params.id;
-    res.status(201).send(`Requisição recebida com sucesso! ${id}`);
-};
-
-exports.delete = (req, res, next) => {
-    let id = req.params.id;
-    res.status(200).send(`Requisição recebida com sucesso! ${id}`);
-};
-*/
