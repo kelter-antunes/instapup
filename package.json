@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-throttle": "^2.0.0",
     "instagram-web-api": "^2.2.0",
     "node-cache": "^5.1.1",
